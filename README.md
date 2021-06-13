@@ -1,3 +1,3 @@
 # Traefik
 
-traefik rever proxy compose files
+traefik reverse proxy compose files for auto deploy
