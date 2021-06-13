@@ -1,0 +1,169 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.4
+    restart: always
+    volumes:
+      - /srv/traefik/config/:/etc/traefik:z
+      - /srv/traefik/acme.json:/acme.json:z
+      - /var/run/docker.sock:/var/run/docker.sock:z,ro
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - proxy
+    logging:
+      driver: loki
+      options:
+        loki-url: "${LOKI_URL}"
+        loki-external-labels: env=${ENV}
+        loki-relabel-config: |
+          - action: labeldrop
+            regex: filename
+        loki-pipeline-stages: |
+          - json:
+              expressions:
+                  service: RequestHost
+          - labels:
+              service:
+    command:
+      # entrypoints redirect to https on http and default certResolver is letsencrypt prod
+      - "--entryPoints.http.address=:80"
+      - "--entryPoints.http.transport.respondingTimeouts.readTimeout=42"
+      - "--entryPoints.http.transport.respondingTimeouts.writeTimeout=42"
+      - "--entryPoints.http.transport.respondingTimeouts.idleTimeout=10"
+      - "--entryPoints.http.http.redirections.entryPoint.to=https"
+      - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.http.http.redirections.entryPoint.permanent=true"
+      - "--entryPoints.https.address=:443"
+      - "--entryPoints.https.transport.respondingTimeouts.readTimeout=42"
+      - "--entryPoints.https.transport.respondingTimeouts.writeTimeout=0"
+      - "--entryPoints.https.transport.respondingTimeouts.idleTimeout=180"
+      # global static config
+      - "--global.checkNewVersion=false"
+      - "--global.sendAnonymousUsage=false"
+      - "--pilot.token=${PILOT_PASSWD}"
+      - "--pilot.dashboard=false"
+      - "--experimental.plugins.traefik-plugin-ip2location.modulename=github.com/negasus/traefik-plugin-ip2location"
+      - "--experimental.plugins.traefik-plugin-ip2location.version=v0.1.0"
+      # traefik log to stdout
+      - "--log.level=ERROR"
+      - "--log.format=json"
+      # access log to stdout
+      - "--accesslog.bufferingsize=10"
+      - "--accessLog.format=json"
+      - "--accesslog.fields.defaultmode=keep"
+      - "--accesslog.fields.names.GzipRatio=keep"
+      - "--accesslog.fields.headers.names.Authorization=drop"
+      - "--accesslog.fields.headers.names.User-Agent=keep"
+      - "--accesslog.fields.headers.names.Referer=keep"
+      - "--accesslog.fields.headers.names.Content-Type=keep"
+      - "--accesslog.fields.headers.names.Accept-Language=keep"
+      - "--accesslog.fields.headers.names.CountryCode=keep"
+      # disabled traefik api
+      - "--api.dashboard=true"
+      # docker provider
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=proxy"
+      # dynamic yaml file provider
+      - "--providers.file.filename=/etc/traefik/traefik-dynamic.yml"
+      - "--providers.file.watch=true"
+      # prometheus metrics at servername.tld/metrics
+      - "--metrics.prometheus.manualRouting=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.buckets[0]=0.1"
+      - "--metrics.prometheus.buckets[1]=0.3"
+      - "--metrics.prometheus.buckets[2]=1.2"
+      - "--metrics.prometheus.buckets[3]=5.0"
+      # cert dns acme cloudflare
+      #- "--certificatesResolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesResolvers.le.acme.email=admin@paulgo.io"
+      - "--certificatesResolvers.le.acme.storage=/acme.json"
+      - "--certificatesResolvers.le.acme.keyType=EC384"
+      - "--certificatesResolvers.le.acme.dnsChallenge.provider=cloudflare"
+      - "--certificatesResolvers.le.acme.dnsChallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+      - "--certificatesResolvers.le.acme.dnsChallenge.delayBeforeCheck=0"
+    labels:
+      - traefik.enable=true
+      # all wildcards domain certs for the instance
+      - traefik.http.routers.traefik.tls.domains[0].main=paulgo.io
+      - traefik.http.routers.traefik.tls.domains[0].sans=*.paulgo.io
+      - traefik.http.routers.traefik.tls.domains[1].main=paulgo.net
+      - traefik.http.routers.traefik.tls.domains[1].sans=*.paulgo.net
+      - traefik.http.routers.traefik.tls.domains[2].main=paulgo.dev
+      - traefik.http.routers.traefik.tls.domains[2].sans=*.paulgo.dev
+      - traefik.http.routers.traefik.tls.domains[3].main=paulgo.de
+      - traefik.http.routers.traefik.tls.domains[3].sans=*.paulgo.de
+      - traefik.http.routers.traefik.tls.domains[4].main=paul-go.com
+      - traefik.http.routers.traefik.tls.domains[4].sans=*.paul-go.com
+      # block hostname with internal-secure chain and noop service
+      - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)&&Method(`GET`,`HEAD`)
+      - traefik.http.routers.traefik.entrypoints=https
+      - traefik.http.routers.traefik.tls.certresolver=le
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=internal-secure
+      # manual router for prometheus metrics
+      - traefik.http.routers.metrics.rule=Host(`${HOSTNAME}`)&&Path(`/traefik/metrics`)&&Method(`GET`,`HEAD`)
+      - traefik.http.routers.metrics.entrypoints=https
+      - traefik.http.routers.metrics.tls.certresolver=le
+      - traefik.http.routers.metrics.service=prometheus@internal
+      - traefik.http.routers.metrics.middlewares=internal-secure,auth-metrics
+      # manual router for node exporter metrics
+      - traefik.http.routers.node.rule=Host(`${HOSTNAME}`)&&Path(`/node/metrics`)&&Method(`GET`,`HEAD`)
+      - traefik.http.routers.node.entrypoints=https
+      - traefik.http.routers.node.tls.certresolver=le
+      - traefik.http.routers.node.service=node-service@file
+      - traefik.http.routers.node.middlewares=internal-secure,auth-metrics,metrics-path
+      - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
+      # default middleware chains for external and internal
+      - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,ip2location@file,homeip,rate-limit,gzip-compress
+      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,ip2location@file,service-unhealthy,gzip-compress
+      # internal middlewares basic auth, ipwhitelist and ratelimiting
+      - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
+      - traefik.http.middlewares.homeip.ipwhitelist.sourcerange=${HOME_IP}
+      - traefik.http.middlewares.rate-limit.ratelimit.average=100
+      - traefik.http.middlewares.rate-limit.ratelimit.burst=50
+      # secure headers basic params, hsts 2 years all domains, remove x-powered-by
+      - traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN
+      - traefik.http.middlewares.secure-headers.headers.sslRedirect=true
+      - traefik.http.middlewares.secure-headers.headers.browserXssFilter=true
+      - traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.secure-headers.headers.stsPreload=true
+      - traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.secure-headers.headers.stsSeconds=63113904
+      - traefik.http.middlewares.secure-headers.headers.forceSTSHeader=true
+      - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.X-Powered-By=
+      - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.Expect-CT=enforce, max-age=30, report-uri="https://paulgo.report-uri.com/r/d/ct/enforce"
+      # curcuit breaker, if service unhealthy 503
+      - traefik.http.middlewares.service-unhealthy.circuitbreaker.expression=LatencyAtQuantileMS(50.0)>5000
+      # default add gzip compression
+      - traefik.http.middlewares.gzip-compress.compress=true
+    environment:
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+
+  node:
+    image: quay.io/prometheus/node-exporter:latest
+    restart: always
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - /:/host:ro,rslave,z
+    pid: host
+    network_mode: host
+    logging:
+      driver: loki
+      options:
+        loki-url: "${LOKI_URL}"
+        loki-external-labels: env=${ENV}
+        loki-relabel-config: |
+          - action: labeldrop
+            regex: filename
+    # labels defined in traefik labels
+
+networks:
+  proxy:
+    external: true
