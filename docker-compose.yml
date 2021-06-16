@@ -24,9 +24,9 @@ services:
         loki-pipeline-stages: |
           - json:
               expressions:
-                  service: RequestHost
+                  router: RouterName
           - labels:
-              service:
+              router:
     command:
       # entrypoints redirect to https on http and default certResolver is letsencrypt prod
       - "--entryPoints.http.address=:80"
