@@ -79,6 +79,17 @@ services:
       - "--certificatesResolvers.le.acme.dnsChallenge.delayBeforeCheck=0"
     labels:
       - traefik.enable=true
+      # default tls options
+      - tls.options.default.minVersion=VersionTLS12
+      - tls.options.default.sniStrict=true
+      - tls.options.default.curvePreferences[0]=CurveP521
+      - tls.options.default.curvePreferences[1]=CurveP384
+      - tls.options.default.cipherSuites[0]=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - tls.options.default.cipherSuites[1]=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - tls.options.default.cipherSuites[2]=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - tls.options.default.cipherSuites[3]=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - tls.options.default.cipherSuites[4]=TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+      - tls.options.default.cipherSuites[5]=TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
       # all wildcards domain certs for the instance
       - traefik.http.routers.traefik.tls.domains[0].main=paulgo.io
       - traefik.http.routers.traefik.tls.domains[0].sans=*.paulgo.io
