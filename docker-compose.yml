@@ -62,21 +62,13 @@ services:
       - "--accesslog.fields.headers.names.Accept-Language=keep"
       - "--accesslog.fields.headers.names.CountryCode=keep"
       # disabled traefik api
-      - "--api.dashboard=true"
+      #- "--api.dashboard=true"
       # docker provider
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=proxy"
       # dynamic yaml file provider
       - "--providers.file.filename=/etc/traefik/traefik-dynamic.yml"
       - "--providers.file.watch=true"
-      # prometheus metrics at servername.tld/metrics
-      - "--metrics.prometheus.manualRouting=true"
-      - "--metrics.prometheus.addServicesLabels=true"
-      - "--metrics.prometheus.addEntryPointsLabels=true"
-      - "--metrics.prometheus.buckets[0]=0.1"
-      - "--metrics.prometheus.buckets[1]=0.3"
-      - "--metrics.prometheus.buckets[2]=1.2"
-      - "--metrics.prometheus.buckets[3]=5.0"
       # cert dns acme cloudflare
       #- "--certificatesResolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesResolvers.le.acme.email=admin@paulgo.io"
@@ -102,18 +94,12 @@ services:
       - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)&&Method(`GET`,`HEAD`)
       - traefik.http.routers.traefik.entrypoints=https
       - traefik.http.routers.traefik.tls.certresolver=le
-      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.service=noop@internal
       - traefik.http.routers.traefik.middlewares=internal-secure
-      # manual router for prometheus metrics
-      - traefik.http.routers.metrics.rule=Host(`${HOSTNAME}`)&&Path(`/traefik/metrics`)&&Method(`GET`,`HEAD`)
-      - traefik.http.routers.metrics.entrypoints=https
-      - traefik.http.routers.metrics.tls.certresolver=le
-      - traefik.http.routers.metrics.service=prometheus@internal
-      - traefik.http.routers.metrics.middlewares=internal-secure,auth-metrics
       # manual router for node exporter metrics
       - traefik.http.routers.node.rule=Host(`${HOSTNAME}`)&&Path(`/node/metrics`)&&Method(`GET`,`HEAD`)
       - traefik.http.routers.node.entrypoints=https
-      - traefik.http.routers.node.tls.certresolver=le
+      - traefik.http.routers.node.tls=true
       - traefik.http.routers.node.service=node-service@file
       - traefik.http.routers.node.middlewares=internal-secure,auth-metrics,metrics-path
       - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
