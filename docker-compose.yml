@@ -20,7 +20,7 @@ services:
         loki-external-labels: env={ENV}
         loki-relabel-config: |
           - action: labeldrop
-            regex: filename
+            regex: 'filename'
         loki-pipeline-stages: |
           - json:
               expressions:
@@ -33,6 +33,12 @@ services:
           - replace:
               expression: '(/search\?q=.*?\")'
               replace: '/search"'
+          - replace:
+              expression: '(/autocompleter\?q=.*?\")'
+              replace: '/autocompleter"'
+          - replace:
+              expression: '(/*\?q=.*?\")'
+              replace: '/?q="'
     command:
       # entrypoints redirect to https on http and default certResolver is letsencrypt prod
       - "--entryPoints.http.address=:80"
