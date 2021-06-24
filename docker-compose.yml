@@ -103,8 +103,8 @@ services:
       - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
       - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,service-unhealthy,gzip-compress
       # internal middlewares basic auth, ipwhitelist and ratelimiting
-      - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
-      - traefik.http.middlewares.homeip.ipwhitelist.sourcerange=${HOME_IP}
+      - traefik.http.middlewares.auth-metrics.basicauth.users={KEY2}
+      - traefik.http.middlewares.homeip.ipwhitelist.sourcerange={IP}
       - traefik.http.middlewares.rate-limit.ratelimit.average=100
       - traefik.http.middlewares.rate-limit.ratelimit.burst=50
       # secure headers basic params, hsts 2 years all domains, remove x-powered-by
@@ -124,8 +124,8 @@ services:
       # default add gzip compression
       - traefik.http.middlewares.gzip-compress.compress=true
     environment:
-      - CF_API_EMAIL=${CF_API_EMAIL}
-      - CF_API_KEY=${CF_API_KEY}
+      - CF_API_EMAIL={EMAIL}
+      - CF_API_KEY={KEY1}
 
   node:
     image: quay.io/prometheus/node-exporter:latest
@@ -144,7 +144,7 @@ services:
         loki-relabel-config: |
           - action: labeldrop
             regex: filename
-    # labels defined in traefik labels
+    # labels defined in traefik dynamic config
 
 networks:
   proxy:
