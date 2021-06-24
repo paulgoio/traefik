@@ -43,7 +43,6 @@ services:
       # global static config
       - "--global.checkNewVersion=false"
       - "--global.sendAnonymousUsage=false"
-      - "--pilot.token=${PILOT_PASSWD}"
       - "--pilot.dashboard=false"
       # traefik log to stdout
       - "--log.level=ERROR"
