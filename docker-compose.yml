@@ -101,8 +101,8 @@ services:
       - traefik.http.routers.node.middlewares=internal-secure,auth-metrics,metrics-path
       - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
       # default middleware chains for external and internal
-      - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,ip2location@file,homeip,rate-limit,gzip-compress
-      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,ip2location@file,service-unhealthy,gzip-compress
+      - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
+      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,service-unhealthy,gzip-compress
       # internal middlewares basic auth, ipwhitelist and ratelimiting
       - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
       - traefik.http.middlewares.homeip.ipwhitelist.sourcerange=${HOME_IP}
