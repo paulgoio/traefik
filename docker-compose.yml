@@ -103,7 +103,7 @@ services:
       - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
       - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,service-unhealthy,gzip-compress
       # internal middlewares basic auth, ipwhitelist and ratelimiting
-      - traefik.http.middlewares.auth-metrics.basicauth.users={KEY2}
+      - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
       - traefik.http.middlewares.homeip.ipwhitelist.sourcerange={IP}
       - traefik.http.middlewares.rate-limit.ratelimit.average=100
       - traefik.http.middlewares.rate-limit.ratelimit.burst=50
