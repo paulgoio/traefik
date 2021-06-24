@@ -30,6 +30,9 @@ services:
           - replace:
               expression: '(?:[0-9]{1,3}\.){3}([0-9]{1,3})'
               replace: '***'
+          - replace:
+              expression: '(/search\?q=.*?\")'
+              replace: '/search"'
     command:
       # entrypoints redirect to https on http and default certResolver is letsencrypt prod
       - "--entryPoints.http.address=:80"
