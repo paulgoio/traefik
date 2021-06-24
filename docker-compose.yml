@@ -45,8 +45,6 @@ services:
       - "--global.sendAnonymousUsage=false"
       - "--pilot.token=${PILOT_PASSWD}"
       - "--pilot.dashboard=false"
-      - "--experimental.plugins.traefik-plugin-ip2location.modulename=github.com/negasus/traefik-plugin-ip2location"
-      - "--experimental.plugins.traefik-plugin-ip2location.version=v0.1.0"
       # traefik log to stdout
       - "--log.level=ERROR"
       - "--log.format=json"
@@ -60,7 +58,6 @@ services:
       - "--accesslog.fields.headers.names.Referer=keep"
       - "--accesslog.fields.headers.names.Content-Type=keep"
       - "--accesslog.fields.headers.names.Accept-Language=keep"
-      - "--accesslog.fields.headers.names.CountryCode=keep"
       # disabled traefik api
       #- "--api.dashboard=true"
       # docker provider
