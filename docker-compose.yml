@@ -124,7 +124,6 @@ services:
       - traefik.http.middlewares.rate-limit.ratelimit.burst=50
       # secure headers basic params, hsts 2 years all domains, remove x-powered-by
       - traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN
-      - traefik.http.middlewares.secure-headers.headers.sslRedirect=true
       - traefik.http.middlewares.secure-headers.headers.browserXssFilter=true
       - traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true
       - traefik.http.middlewares.secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin
