@@ -66,12 +66,21 @@ services:
       - "--accesslog.bufferingsize=10"
       - "--accessLog.format=json"
       - "--accesslog.fields.defaultmode=keep"
-      - "--accesslog.fields.names.GzipRatio=keep"
       - "--accesslog.fields.headers.names.Authorization=drop"
+      # drop user agent evetually and just write browser/os/type/device header through regex
       - "--accesslog.fields.headers.names.User-Agent=keep"
+      # Origin is eventually going to replace Referer header; but want to RL test browser support first
       - "--accesslog.fields.headers.names.Referer=keep"
-      - "--accesslog.fields.headers.names.Content-Type=keep"
+      - "--accesslog.fields.headers.names.Origin=keep"
+      # start logging backend server and server-timing header (if enabled at upstream)
+      - "--accesslog.fields.headers.names.server=keep"
+      - "--accesslog.fields.headers.names.server-timing=keep"
+      # new sec headers; since firefox 90 / chrome 80
       - "--accesslog.fields.headers.names.Accept-Language=keep"
+      - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
+      - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
+      - "--accesslog.fields.headers.names.Sec-Fetch-Site=keep"
+      - "--accesslog.fields.headers.names.Sec-Fetch-User=keep"
       # disabled traefik api
       #- "--api.dashboard=true"
       # docker provider
