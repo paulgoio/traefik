@@ -69,11 +69,9 @@ services:
       - "--accesslog.fields.headers.names.Authorization=drop"
       # drop user agent evetually and just write browser/os/type/device header through regex
       - "--accesslog.fields.headers.names.User-Agent=keep"
-      # Origin is eventually going to replace Referer header; but want to RL test browser support first
+      # Log Referer header
       - "--accesslog.fields.headers.names.Referer=keep"
-      - "--accesslog.fields.headers.names.Origin=keep"
-      # start logging backend server and server-timing header (if enabled at upstream)
-      - "--accesslog.fields.headers.names.server=keep"
+      # start logging backend server-timing header (if enabled at upstream)
       - "--accesslog.fields.headers.names.server-timing=keep"
       # new sec headers; since firefox 90 / chrome 80
       - "--accesslog.fields.headers.names.Accept-Language=keep"
