@@ -67,14 +67,11 @@ services:
       - "--accessLog.format=json"
       - "--accesslog.fields.defaultmode=keep"
       - "--accesslog.fields.headers.names.Authorization=drop"
-      # drop user agent evetually and just write browser/os/type/device header through regex
-      - "--accesslog.fields.headers.names.User-Agent=keep"
       # Log Referer header
       - "--accesslog.fields.headers.names.Referer=keep"
       # start logging backend server-timing header (if enabled at upstream)
       - "--accesslog.fields.headers.names.server-timing=keep"
       # new sec headers; since firefox 90 / chrome 80
-      - "--accesslog.fields.headers.names.Accept-Language=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Site=keep"
