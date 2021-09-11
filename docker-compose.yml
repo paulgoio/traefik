@@ -37,7 +37,7 @@ services:
               expression: '(/autocompleter\?q=.*?\")'
               replace: '/autocompleter"'
           - replace:
-              expression: '(/image_proxy/\?url=.*?\")'
+              expression: '(/image_proxy\?url=.*?\")'
               replace: '/image_proxy"'
           - replace:
               expression: '(/*\?q=.*?\")'
