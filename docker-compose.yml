@@ -37,8 +37,8 @@ services:
               expression: '(/autocompleter\?q=.*?\")'
               replace: '/autocompleter"'
           - replace:
-              expression: '(/morty/\?(mortyurl|mortyhash)=.*?\")'
-              replace: '/morty"'
+              expression: '(/image_proxy/\?url=.*?\")'
+              replace: '/image_proxy"'
           - replace:
               expression: '(/*\?q=.*?\")'
               replace: '/?q="'
