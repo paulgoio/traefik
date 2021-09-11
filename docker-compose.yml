@@ -122,7 +122,7 @@ services:
       - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
       # default middleware chains for external and internal
       - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
-      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,service-unhealthy,gzip-compress
+      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,gzip-compress
       # internal middlewares basic auth, ipwhitelist and ratelimiting
       - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
       - traefik.http.middlewares.homeip.ipwhitelist.sourcerange={IP}
@@ -139,8 +139,6 @@ services:
       - traefik.http.middlewares.secure-headers.headers.forceSTSHeader=true
       - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.X-Powered-By=
       - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.Expect-CT=enforce, max-age=30, report-uri="https://paulgo.report-uri.com/r/d/ct/enforce"
-      # curcuit breaker, if service unhealthy 503
-      - traefik.http.middlewares.service-unhealthy.circuitbreaker.expression=LatencyAtQuantileMS(50.0)>5000
       # default add gzip compression
       - traefik.http.middlewares.gzip-compress.compress=true
     environment:
