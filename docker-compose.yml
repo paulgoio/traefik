@@ -101,14 +101,10 @@ services:
       - traefik.http.routers.traefik.tls.domains[1].sans=*.paulgo.net
       - traefik.http.routers.traefik.tls.domains[2].main=paulgo.dev
       - traefik.http.routers.traefik.tls.domains[2].sans=*.paulgo.dev
-      - traefik.http.routers.traefik.tls.domains[3].main=paulgo.de
-      - traefik.http.routers.traefik.tls.domains[3].sans=*.paulgo.de
-      - traefik.http.routers.traefik.tls.domains[4].main=paul-go.com
-      - traefik.http.routers.traefik.tls.domains[4].sans=*.paul-go.com
-      - traefik.http.routers.traefik.tls.domains[5].main=staging.paulgo.io
-      - traefik.http.routers.traefik.tls.domains[5].sans=*.staging.paulgo.io
-      - traefik.http.routers.traefik.tls.domains[6].main=searxng.com
-      - traefik.http.routers.traefik.tls.domains[6].sans=*.searxng.com
+      - traefik.http.routers.traefik.tls.domains[3].main=staging.paulgo.io
+      - traefik.http.routers.traefik.tls.domains[3].sans=*.staging.paulgo.io
+      - traefik.http.routers.traefik.tls.domains[4].main=searxng.com
+      - traefik.http.routers.traefik.tls.domains[4].sans=*.searxng.com
       # block hostname with internal-secure chain and noop service
       - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)&&Method(`GET`,`HEAD`)
       - traefik.http.routers.traefik.entrypoints=https
