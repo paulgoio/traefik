@@ -31,16 +31,16 @@ services:
               expression: '(?:[0-9]{1,3}\.){3}([0-9]{1,3})'
               replace: '***'
           - replace:
-              expression: '(/search\?q=.*?\")'
+              expression: '(/search\.*??q=.*?\")'
               replace: '/search"'
           - replace:
-              expression: '(/autocompleter\?q=.*?\")'
+              expression: '(/autocompleter\.*??q=.*?\")'
               replace: '/autocompleter"'
           - replace:
-              expression: '(/image_proxy\?url=.*?\")'
+              expression: '(/image_proxy\.*??url=.*?\")'
               replace: '/image_proxy"'
           - replace:
-              expression: '(/*\?q=.*?\")'
+              expression: '(/*\.*??q=.*?\")'
               replace: '/?q="'
     command:
       # entrypoints redirect to https on http and default certResolver is letsencrypt prod
