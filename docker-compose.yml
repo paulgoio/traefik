@@ -65,11 +65,14 @@ services:
       # access log to stdout
       - "--accesslog.bufferingsize=10"
       - "--accessLog.format=json"
-      - "--accesslog.fields.defaultmode=keep"
+      - "--accesslog.fields.names.ClientAddr=drop"
+      - "--accesslog.fields.names.ClientHost=drop"
+      - "--accesslog.fields.names.ClientPort=drop"
+      - "--accesslog.fields.names.ClientUsername=drop"
       - "--accesslog.fields.headers.names.Authorization=drop"
-      # Log Referer header
+      # Origin is eventually going to replace Referer header; but want to RL test browser support first
       - "--accesslog.fields.headers.names.Referer=keep"
-      # start logging backend server-timing header (if enabled at upstream)
+      # start logging backend server and server-timing header (if enabled at upstream)
       - "--accesslog.fields.headers.names.server-timing=keep"
       # new sec headers; since firefox 90 / chrome 80
       - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
