@@ -59,6 +59,9 @@ services:
       - "--global.checkNewVersion=false"
       - "--global.sendAnonymousUsage=false"
       - "--pilot.dashboard=false"
+      - "--pilot.token={KEY2}"
+      - "--experimental.plugins.traefikuseragent.modulename=github.com/GiGInnovationLabs/traefikuseragent"
+      - "--experimental.plugins.traefikuseragent.version=v0.0.3"
       # traefik log to stdout
       - "--log.level=ERROR"
       - "--log.format=json"
@@ -70,15 +73,18 @@ services:
       - "--accesslog.fields.names.ClientPort=drop"
       - "--accesslog.fields.names.ClientUsername=drop"
       - "--accesslog.fields.headers.names.Authorization=drop"
-      # Origin is eventually going to replace Referer header; but want to RL test browser support first
+      # origin is eventually going to replace Referer header; but want to RL test browser support first
       - "--accesslog.fields.headers.names.Referer=keep"
-      # start logging backend server and server-timing header (if enabled at upstream)
-      - "--accesslog.fields.headers.names.server-timing=keep"
       # new sec headers; since firefox 90 / chrome 80
       - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Site=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-User=keep"
+      # log user agent parser
+      - "--accesslog.fields.headers.names.X-Device-Browser=keep"
+      - "--accesslog.fields.headers.names.X-Device-Os=keep"
+      - "--accesslog.fields.headers.names.X-Device-Mobile=keep"
+      - "--accesslog.fields.headers.names.X-Device-Bot=keep"
       # disabled traefik api
       #- "--api.dashboard=true"
       # docker provider
@@ -123,7 +129,9 @@ services:
       - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
       # default middleware chains for external and internal
       - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
-      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,gzip-compress
+      - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,useragent,gzip-compress
+      # external plugin as user agent parser
+      - traefik.http.middlewares.useragent.plugin.traefikuseragent.UserAgentHeader=true
       # internal middlewares basic auth, ipwhitelist and ratelimiting
       - traefik.http.middlewares.auth-metrics.basicauth.users=${PROMETHEUS_AUTH}
       - traefik.http.middlewares.homeip.ipwhitelist.sourcerange={IP}
@@ -155,14 +163,6 @@ services:
       - /:/host:ro,rslave,z
     pid: host
     network_mode: host
-    logging:
-      driver: loki
-      options:
-        loki-url: "${LOKI_URL}"
-        loki-external-labels: env={ENV}
-        loki-relabel-config: |
-          - action: labeldrop
-            regex: filename
     # labels defined in traefik dynamic config
 
 networks:
