@@ -147,7 +147,6 @@ services:
       - traefik.http.middlewares.secure-headers.headers.stsSeconds=63113904
       - traefik.http.middlewares.secure-headers.headers.forceSTSHeader=true
       - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.X-Powered-By=
-      - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.Expect-CT=enforce, max-age=30, report-uri="https://paulgo.report-uri.com/r/d/ct/enforce"
       # default add gzip compression
       - traefik.http.middlewares.gzip-compress.compress=true
     environment:
