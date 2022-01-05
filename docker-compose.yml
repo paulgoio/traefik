@@ -70,8 +70,6 @@ services:
       - "--accesslog.fields.names.ClientPort=drop"
       - "--accesslog.fields.names.ClientUsername=drop"
       - "--accesslog.fields.headers.names.Authorization=drop"
-      # origin is eventually going to replace Referer header; but want to RL test browser support first
-      - "--accesslog.fields.headers.names.Referer=keep"
       # new sec headers; since firefox 90 / chrome 80
       - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
@@ -131,7 +129,7 @@ services:
       - traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.secure-headers.headers.browserXssFilter=true
       - traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.secure-headers.headers.referrerPolicy=no-referrer
       - traefik.http.middlewares.secure-headers.headers.stsPreload=true
       - traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.secure-headers.headers.stsSeconds=63113904
