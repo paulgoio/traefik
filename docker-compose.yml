@@ -75,6 +75,13 @@ services:
       - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-Site=keep"
       - "--accesslog.fields.headers.names.Sec-Fetch-User=keep"
+      # enable prometheus metrics
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.manualrouting=true"
+      - "--metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addrouterslabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
       # disabled traefik api
       #- "--api.dashboard=true"
       # docker provider
@@ -117,6 +124,12 @@ services:
       - traefik.http.routers.node.service=node-service@file
       - traefik.http.routers.node.middlewares=internal-secure,auth-metrics,metrics-path
       - traefik.http.middlewares.metrics-path.replacepath.path=/metrics
+      # manual router for traefik prometheus metrics
+      - traefik.http.routers.prometheus.rule=Host(`${HOSTNAME}`)&&Path(`/traefik/metrics`)&&Method(`GET`,`HEAD`)
+      - traefik.http.routers.prometheus.entrypoints=https
+      - traefik.http.routers.prometheus.tls=true
+      - traefik.http.routers.prometheus.service=prometheus@internal
+      - traefik.http.routers.prometheus.middlewares=internal-secure,auth-metrics,metrics-path
       # default middleware chains for external and internal
       - traefik.http.middlewares.internal-secure.chain.middlewares=secure-headers,homeip,rate-limit,gzip-compress
       - traefik.http.middlewares.external-secure.chain.middlewares=secure-headers,gzip-compress
