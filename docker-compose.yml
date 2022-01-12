@@ -13,35 +13,6 @@ services:
       - 443:443
     networks:
       - proxy
-    logging:
-      driver: loki
-      options:
-        loki-url: "${LOKI_URL}"
-        loki-external-labels: env={ENV}
-        loki-relabel-config: |
-          - action: labeldrop
-            regex: 'filename'
-        loki-pipeline-stages: |
-          - json:
-              expressions:
-                  service: RequestHost
-          - labels:
-              service:
-          - replace:
-              expression: '(?:[0-9]{1,3}\.){3}([0-9]{1,3})'
-              replace: '***'
-          - replace:
-              expression: '(/search\?(q=|preferences=).*?\")'
-              replace: '/search"'
-          - replace:
-              expression: '(/autocompleter\?(q=|preferences=).*?\")'
-              replace: '/autocompleter"'
-          - replace:
-              expression: '(/image_proxy\?url=.*?\")'
-              replace: '/image_proxy"'
-          - replace:
-              expression: '(/*\?(q=|preferences=).*?\")'
-              replace: '/?q="'
     command:
       # entrypoints redirect to https on http and default certResolver is letsencrypt prod
       - "--entryPoints.http.address=:80"
@@ -62,19 +33,6 @@ services:
       # traefik log to stdout
       - "--log.level=ERROR"
       - "--log.format=json"
-      # access log to stdout
-      - "--accesslog.bufferingsize=10"
-      - "--accessLog.format=json"
-      - "--accesslog.fields.names.ClientAddr=drop"
-      - "--accesslog.fields.names.ClientHost=drop"
-      - "--accesslog.fields.names.ClientPort=drop"
-      - "--accesslog.fields.names.ClientUsername=drop"
-      - "--accesslog.fields.headers.names.Authorization=drop"
-      # new sec headers; since firefox 90 / chrome 80
-      - "--accesslog.fields.headers.names.Sec-Fetch-Dest=keep"
-      - "--accesslog.fields.headers.names.Sec-Fetch-Mode=keep"
-      - "--accesslog.fields.headers.names.Sec-Fetch-Site=keep"
-      - "--accesslog.fields.headers.names.Sec-Fetch-User=keep"
       # enable prometheus metrics
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.manualrouting=true"
