@@ -67,8 +67,6 @@ services:
       - traefik.http.routers.traefik.tls.domains[2].sans=*.paulgo.dev
       - traefik.http.routers.traefik.tls.domains[3].main=staging.paulgo.io
       - traefik.http.routers.traefik.tls.domains[3].sans=*.staging.paulgo.io
-      - traefik.http.routers.traefik.tls.domains[4].main=searxng.com
-      - traefik.http.routers.traefik.tls.domains[4].sans=*.searxng.com
       # block hostname with internal-secure chain and noop service
       - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)&&Method(`GET`,`HEAD`)
       - traefik.http.routers.traefik.entrypoints=https
